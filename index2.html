@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スワイプ問題集</title>
+<style>
+  body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; align-items: center; justify-content: center; background: #f0f0f0; }
+  #card { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s ease; }
+  h2 { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<div id="card">
+  <h2 id="question">問題がここに出ます</h2>
+  <p id="description" style="color: gray;"></p>
+</div>
+
+<script>
+const questions = [
+  { q: "太陽は東から昇る？", correct: "right", explanation: "正解！太陽は東から昇ります。" },
+  { q: "2 + 2 = 5？", correct: "left", explanation: "間違い！正しくは4です。" },
+  { q: "富士山は日本一高い山？", correct: "right", explanation: "正解！標高3776mです。" }
+];
+
+let index = 0;
+let showingExplanation = false;
+
+const card = document.getElementById('card');
+const qEl = document.getElementById('question');
+const descEl = document.getElementById('description');
+
+function showQuestion() {
+  showingExplanation = false;
+  qEl.textContent = questions[index].q;
+  descEl.textContent = "右スワイプ = 正しい / 左スワイプ = 間違い";
+}
+
+function showExplanation() {
+  showingExplanation = true;
+  qEl.textContent = "解説";
+  descEl.textContent = questions[index].explanation;
+}
+
+function nextQuestion() {
+  index++;
+  if (index >= questions.length) {
+    qEl.textContent = "お疲れ様！全問終了です。";
+    descEl.textContent = "";
+    return;
+  }
+  showQuestion();
+}
+
+// スワイプ検知
+let startX = 0;
+card.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+});
+
+card.addEventListener('touchend', e => {
+  let endX = e.changedTouches[0].clientX;
+  let diff = endX - startX;
+  
+  if (Math.abs(diff) > 50) {
+    if (!showingExplanation) {
+      if (diff > 0) { // 右スワイプ
+        if (questions[index].correct === "right") {
+          nextQuestion();
+        } else {
+          showExplanation();
+        }
+      } else { // 左スワイプ
+        if (questions[index].correct === "left") {
+          nextQuestion();
+        } else {
+          showExplanation();
+        }
+      }
+    } else {
+      nextQuestion();
+    }
+  }
+});
+
+showQuestion();
+</script>
+
+</body>
+</html>
